@@ -1,78 +1,133 @@
-/* ДЗ 1 - Функции */
+/* ДЗ 3 - работа с массивами и объеектами */
 
 /*
- Задание 1:
-
- Функция должна принимать один аргумент и возвращать его
+ Задача 1:
+ Напишите аналог встроенного метода forEach для работы с массивами
  */
-function returnFirstArgument(arg) {
-    return arg;
-}
-
-/*
- Задание 2:
-
- Функция должна принимать два аргумента и возвращать сумму переданных значений
- Значение по умолчанию второго аргумента должно быть 100
- */
-function defaultParameterValue(a, b=100) {
-    return a+b;
-}
-
-/*
- Задание 3:
-
- Функция должна возвращать все переданные в нее аргументы в виде массива
- Количество переданных аргументов заранее неизвестно
- */
-function returnArgumentsArray() {
-    var arr = [];
-        for (var i = 0; i < arguments.length; i++) {
-        arr[i] = arguments[i];
+function forEach(array, fn) {
+    for (var i=0; i<array.length; i++) {
+        fn(array[i], i, array);
     }
-    return arr
 }
 
 /*
- Задание 4:
-
- Функция должна принимать другую функцию и возвращать результат вызова переданной функции
+ Задача 2:
+ Напишите аналог встроенного метода map для работы с массивами
  */
-function returnFnResult(fn) {
-    var f = fn();
-    return f; 
-}
+function map(array, fn) {
+    var b = [];
 
-/*
- Задание 5:
+    for (var i=0; i<array.length; i++) {
 
- Функция должна принимать число (значение по умолчанию - 0) и возвращать функцию (F)
- При вызове F, переданное число должно быть увеличено на единицу и возвращено из F
- */
-function returnCounter(number=0) {
-    function F() {
-        number = number+1;
-        return number;
+        b.push(fn(array[i], i, array));
     }
-    return F;
+
+    return b;
 }
 
 /*
- Задание 6 *:
-
- Функция должна принимать другую функцию (F) и некоторое количество дополнительных аргументов
- Функция должна привязать переданные аргументы к функции F и вернуть получившуюся функцию
+ Задача 3:
+ Напишите аналог встроенного метода reduce для работы с массивами
  */
-function bindFunction(fn,a,b,c) {
-    var g = fn.bind(null,a,b,c);
-    return g;
+function reduce(array, fn, initial) {
+    if ((typeof initial) == 'undefined') {
+        var prev = array[0],
+            i = 1;
+    } else {
+        prev = initial,
+        i = 0;
+    }
+    var x = prev;
+
+    for (i; i < array.length; i++) {
+
+        x = fn(x, array[i], i, array);
+
+    }
+
+    return x;
+}
+
+/*
+ Задача 4:
+ Функция принимает объект и имя свойства, которое необходиом удалить из объекта
+ Функция должна удалить указанное свойство из указанного объекта
+ */
+function deleteProperty(obj, prop) {
+    /*а если prop - число? - но это невозможно, тк имя свойства всегда строчного типа */
+    if (prop in obj) {
+        delete obj[prop];
+    }
+}
+
+/*
+ Задача 5:
+ Функция принимает объект и имя свойства и возвращает true или false
+ Функция должна проверить существует ли укзаанное свойство в указанном объекте
+ */
+function hasProperty(obj, prop) {
+    var aa = false;
+
+    if (prop in obj) {
+        aa = true;
+    }
+
+    return aa;
+}
+
+/*
+ Задача 6:
+ Функция должна получить все перечисляемые свойства объекта и вернуть их в виде массива
+ */
+function getEnumProps(obj) {
+    // var b= [];
+    var prop = Object.keys(obj);
+
+    // b = prop.forEach(function (a) {
+    //     return obj[prop[a]]
+    // }) Те Свойства это Не значения , а названия??
+
+    return prop;
+}
+
+/*
+ Задача 7:
+ Функция должна перебрать все свойства объекта, преобразовать их имена в верхний регистра и вернуть в виде массива
+ */
+function upperProps(obj) {
+    var prop = Object.getOwnPropertyNames(obj);
+    var cc = [];
+
+    prop.forEach(function fn(a) {
+        cc.push(a.toUpperCase());
+    })
+
+    return cc;
+}
+
+/*
+ Задача 8 *:
+ Напишите аналог встроенного метода slice для работы с массивами
+ */
+function slice(array, from, to) {
+}
+
+/*
+ Задача 9 *:
+ Функция принимает объект и должна вернуть Proxy для этого объекта
+ Proxy должен перехватывать все попытки записи значений свойств и возводить это значение в квадрат
+ */
+function createProxy(obj) {
 }
 
 export {
-    returnFirstArgument,
-    defaultParameterValue,
-    returnArgumentsArray,
-    returnFnResult,
-    returnCounter,
-    bindFunction
-}
+    forEach,
+    map,
+    reduce,
+    deleteProperty,
+    hasProperty,
+    getEnumProps,
+    upperProps,
+    slice,
+    createProxy
+};
