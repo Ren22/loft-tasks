@@ -123,16 +123,21 @@ function deleteTextNodes(where) {
  */
 
 function deleteTextNodesRecursive(where) {
-    for (var i = 0; i < where.childNodes.length; i++) {
-        if (where.childNodes[i].nodeType == document.ELEMENT_NODE) {
-            deleteTextNodesRecursive(where.childNodes[i]);
-        } else if (where.nodeType == document.TEXT_NODE) {
-            where.parentNode.removeChild(where);
+    if (where.nodeType == document.ELEMENT_NODE) {
+        for (var i = 0; i < where.childNodes.length; i++) {
+            if (where.nodeType == document.ELEMENT_NODE) {
+                deleteTextNodesRecursive(where.childNodes[i]);
+            } else if (where.nodeType == document.TEXT_NODE) {
+                where.removeChild(where.childNodes[i]);
+            }
         }
+    } else if (where.nodeType == document.TEXT_NODE) {
+        where.parentNode.removeChild(where);
     }
 
     return where;
 }
+
 
 //     return where;
 // }
