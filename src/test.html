@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="test">
+        <button name="bla1">bla1</button>
+        <button name="bla1">bla1</button>
+    </div>
+<script>
+
+    function delegate(target, fn) {
+        target.addEventListener('click', function(e) {
+            if (e.target.tagName == 'BUTTON') {
+                fn();
+            }
+        })
+    }
+
+    function fn() {
+        alert("Нажал!");
+    }
+
+    var get = document.getElementsByClassName('test');
+    delegate(get[0], fn);
+
+</script>
+</body>
+</html>
