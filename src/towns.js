@@ -37,10 +37,15 @@ let homeworkContainer = document.querySelector('#homework-container');
  */
 function loadTowns() {
     var promise = new Promise((resolve, reject) => {
+        function onProgress() {
+            document.write('Загрузка..');
+        }
+
         var req = new XMLHttpRequest();
 
         req.open('GET', 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json', true)
         req.responseType = 'json';
+        req.onprogress = onProgress;
         req.onload = () => {
             var res = req.response;
 
@@ -95,7 +100,16 @@ let filterInput = homeworkContainer.querySelector('#filter-input');
 let filterResult = homeworkContainer.querySelector('#filter-result');
 let townsPromise;
 
-filterInput.addEventListener('keyup', function() {
+filterInput.addEventListener('keyup', function(e) {
+    var chunk;
+    var full = loadTowns();
+
+    chunk =+ e.charCode;
+    full.forEach(item, i, arr) {
+        if (isMatching(item, chunk)) {
+            filterInput.innerHTML
+        }
+    }
 
 });
 
