@@ -35,6 +35,7 @@ let homeworkContainer = document.querySelector('#homework-container');
  *
  * @return {Promise<Array<{name: string}>>}
  */
+
 function loadTowns() {
     var promise = new Promise((resolve, reject) => {
 
@@ -42,7 +43,10 @@ function loadTowns() {
 
         req.open('GET', 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json', true)
         req.responseType = 'json';
-        req.onprogress = document.write('Загрузка..');
+        req.onprogress = () => {
+            loadingBlock.style.display = 'block';
+            loadingBlock.innerText = 'Загрузка...';
+        };
         req.onload = () => {
             var res = req.response;
 
@@ -100,21 +104,27 @@ let townsPromise;
 
 loadTowns()
     .then(response => {
+        loadingBlock.style.display = 'none';
+
         filterInput.addEventListener('keyup', function() {
             var chunk = filterInput.value;
             var ress = [];
-            filterResult.innerHTML = [];
 
-            for (var i = 0; i < response.length; i++) {
-                if (isMatching(response[i].name, chunk)) {
-                    ress.push(chunk);
+            filterResult.innerHTML = '';
+            if(chunk != '') {
+                for (var i = 0; i < response.length; i++) {
+                    if (isMatching(response[i].name, chunk)) {
+                        ress.push(chunk);
+                    }
                 }
-            }
-            ress.forEach(function (item) {
-                filterResult.innerHTML += '<li>' + item + '</li>';
-            })
+
+                ress.forEach(function (item) {
+                    filterResult.innerHTML += '<li>' + item + '</li>';
+                });
+            };
         });
-    })
+    });
+
 
 
 export {
