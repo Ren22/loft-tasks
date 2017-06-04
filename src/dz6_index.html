@@ -5,14 +5,125 @@
     <title>Dz6</title>
 </head>
 <body>
-    <div id="homeworkContainer ">
-        <input type="text" id="filter-input">
-        <ul>
-
-        </ul>
+    <div id="homework-container">
+        <div id="loading-block">
+            <input type="text" id="filter-input">
+            <ul id="filter-result"></ul>
+        </div>
     </div>
-<script src = "towns.js">
+
+
+<script>
+
+let homeworkContainer = document.querySelector('#homework-container');
+
+function loadTowns() {
+    var promise = new Promise((resolve, reject) => {
+        var req = new XMLHttpRequest();
+//        req.onprogress = () => {
+//            loadingBlock.innerText = 'Загрузка...';
+//        }
+        req.open('GET', 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json', true);
+        req.responseType = 'json';
+
+        req.onload = () => {
+
+            var res = req.response;
+
+            res.sort(function (a, b) {
+                if (a.name > b.name) {
+                    return 1;
+                }
+                if (a.name < b.name) {
+                    return -1;
+                }
+                // a должно быть равным b
+                return 0;
+            });
+            resolve(res);
+        };
+        req.send();
+    });
+
+    return promise;
+}
+
+/**
+ * Функция должна проверять встречается ли подстрока chunk в строке full
+ * Проверка должна происходить без учета регистра символов
+ *
+ * @example
+ * isMatching('Moscow', 'moscow') // true
+ * isMatching('Moscow', 'mosc') // true
+ * isMatching('Moscow', 'cow') // true
+ * isMatching('Moscow', 'SCO') // true
+ * isMatching('Moscow', 'Moscov') // false
+ *
+ * @return {boolean}
+ */
+function isMatching(full, chunk) {
+    full = full.toLowerCase();
+    chunk = chunk.toLowerCase();
+    if (~full.indexOf(chunk)) {
+
+        return true;
+    } else {
+
+        return false;
+    }
+}
+
+let loadingBlock = homeworkContainer.querySelector('#loading-block');
+//  let filterBlock = homeworkContainer.querySelector('#filter-block');
+let filterInput = homeworkContainer.querySelector('#filter-input');
+let filterResult = homeworkContainer.querySelector('#filter-result');
+let townsPromise;
+
+//
+//filterInput.addEventListener('keyup', function(e) {
+//    new Promise ((resolve, reject) => {
+//        townsPromise = loadTowns();
+//        resolve(townsPromise);
+//    })
+//        .then(response => {
+//            console.log(response);
+//            var chunk = filterInput.value;
+//            var ress = [];
+//
+//            filterResult.innerHTML = [];
+//
+//            for (var i = 0; i < response.length; i++) {
+//                if (isMatching(response[i].name, chunk)) {
+//                    ress.push(chunk);
+//                }
+//            }
+//            ress.forEach(function (item) {
+//                filterResult.innerHTML += '<li>' + item + '</li>';
+//            })
+//        })
+//    });
+
+
+loadTowns()
+    .then(response => {
+        console.log(response)
+        filterInput.addEventListener('keyup', function() {
+            var chunk = filterInput.value;
+            var ress = [];
+            filterResult.innerHTML = [];
+
+            for (var i = 0; i < response.length; i++) {
+                if (isMatching(response[i].name, chunk)) {
+                    ress.push(chunk);
+                }
+            }
+            ress.forEach(function (item) {
+                filterResult.innerHTML += '<li>' + item + '</li>';
+            })
+        });
+    })
 
 </script>
+
 </body>
 </html>

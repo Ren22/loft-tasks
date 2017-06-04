@@ -22,7 +22,7 @@
 
 /**
  * homeworkContainer - это контейнер для всех ваших домашних заданий
- * Если вы создаете новые html-элементы и добавляете их на страницу, то дабавляйте их только в этот контейнер
+ * Если вы создаете новые html-элементы и добавляете их на страницу, то добавляйте их только в этот контейнер
  *
  * @example
  * homeworkContainer.appendChild(...);
@@ -37,15 +37,12 @@ let homeworkContainer = document.querySelector('#homework-container');
  */
 function loadTowns() {
     var promise = new Promise((resolve, reject) => {
-        function onProgress() {
-            document.write('Загрузка..');
-        }
 
         var req = new XMLHttpRequest();
 
         req.open('GET', 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json', true)
         req.responseType = 'json';
-        req.onprogress = onProgress;
+        req.onprogress = document.write('Загрузка..');
         req.onload = () => {
             var res = req.response;
 
@@ -66,7 +63,6 @@ function loadTowns() {
     });
 
     return promise;
-
 }
 
 /**
@@ -100,18 +96,26 @@ let filterInput = homeworkContainer.querySelector('#filter-input');
 let filterResult = homeworkContainer.querySelector('#filter-result');
 let townsPromise;
 
-filterInput.addEventListener('keyup', function(e) {
-    var chunk;
-    var full = loadTowns();
 
-    chunk =+ e.charCode;
-    full.forEach(item, i, arr) {
-        if (isMatching(item, chunk)) {
-            filterInput.innerHTML
-        }
-    }
 
-});
+loadTowns()
+    .then(response => {
+        filterInput.addEventListener('keyup', function() {
+            var chunk = filterInput.value;
+            var ress = [];
+            filterResult.innerHTML = [];
+
+            for (var i = 0; i < response.length; i++) {
+                if (isMatching(response[i].name, chunk)) {
+                    ress.push(chunk);
+                }
+            }
+            ress.forEach(function (item) {
+                filterResult.innerHTML += '<li>' + item + '</li>';
+            })
+        });
+    })
+
 
 export {
     loadTowns,
