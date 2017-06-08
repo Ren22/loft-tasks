@@ -30,6 +30,7 @@ module.exports = function(config) {
             require('karma-chrome-launcher'),
             require('karma-coverage-istanbul-reporter'),
             require('karma-sourcemap-loader')
-        ]
+        ],
+        allow_scripts_to_close_windows: true
     });
 };

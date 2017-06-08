@@ -21,6 +21,7 @@ function createWindow(name, width, height) {
  */
 function closeWindow(window) {
 
+    window.open(name, width, height);
     window.close();
 }
 
