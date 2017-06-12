@@ -40,19 +40,40 @@
 <body>
     <div class="main-container">
         <table>
-            <tr><td><input type="text" name="name_search"></td>
-                <td><input type="text" name="name_search"></td>
+            <tr><td><input type="text" class="lft_inpt" name="name_search"></td>
+                <td><input type="text" class="lkovr_rght_lst" name="name_search"></td>
             </tr>
-            <tr><td class="friends"><ul class="friends-pick"></ul></td>
-                <td class="friends"><ul class="friends-pick droppable"></ul></td>
+            <tr><td class="friends"><ul class="lft_list friends-pick"></ul></td>
+                <td class="friends"><ul class="rght_list friends-pick droppable"></ul></td>
             </tr>
         </table>
         <!--<input type="text" name="name_search">-->
         <!--<div class="friends"><ul class="friends-pick"></ul></div>-->
         <!--<div class="friends droppable"><ul class="friends-pick"></ul></div>-->
     </div>
-
     <script>
+        var left_input = document.querySelector('.lft_inpt');
+        var chunk = left_input.value;
+
+            left_input.addEventListener('keyup', (e) => {
+            return new Promise ((resolve, reject) => {
+                var get_lst = document.querySelector('.lft_list').children;
+                get_lst = Array.from(get_lst);
+                var all_names = [];
+
+                get_lst.forEach(i => {
+                    var name_elem = i.querySelector('.name');
+                    all_names.push(name_elem.innerText);
+                })
+                resolve(all_names);
+            })
+                .then ((all_names => {
+
+                }))
+        })
+    </script>
+    <script>
+
         var template = `
         {{#each items}}
             <li class="draggable">
@@ -110,8 +131,6 @@
             var shiftY = e.pageY - coords.top;
 
             elem.style.position = 'absolute';
-//            elem.style.width = '400px';
-//            document.body.appendChild(friends_left);
             moveAt(e);
 
             elem.style.zIndex = 1000;
@@ -124,7 +143,7 @@
             document.addEventListener('mousemove', (e) => {
                 moveAt(e);
             });
-            document.addEventListener('mouseup', (e) => {
+            document.addEventListener('mouseup', () => {
 
                 function findDrop(element) {
                     element.hidden = true;
@@ -152,7 +171,7 @@
                     }
                 });
 
-            //ВОПРОС: если ниже код реализовать с addEventListener - фото будет отдельно тянуться
+            //ВОПРОC>>??: если ниже код реализовать с addEventListener - фото будет отдельно тянуться
             elem.ondragstart = function() {
                 return false;
             }
