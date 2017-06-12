@@ -3,30 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <title>FriendsFilter</title>
+    <style type="text/css">
+        .main-container{
+            display: flex;
+        }
+
+        .friends {
+            position: relative;
+            flex-basis: 400px;
+            position: relative;
+            outline: 1px solid red;
+        }
+
+        ul.friends-pick, li {
+            max-height: 400px;
+            overflow-y:auto;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            outline: 1px solid red;
+        }
+    </style>
     <script src="https://vk.com/js/api/openapi.js?146" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
 </head>
 <body>
-<div class="main-container"></div>
+    <div class="main-container">
+        <div class="friends"><ul class="friends-pick"></ul></div>
+        <div class="friends droppable"><ul class="friends-pick"></ul></div>
+    </div>
 
-<script>
-    new Promise((resolve) => {
-        window.onload = resolve;
-    })
-    .then(() => {
-        return new Promise((resolve, reject)=> {
-            VK.init({
-                apiId: 6066978
-            });
+    <script>
+        var template = `
+        {{#each items}}
+            <li class="draggable">
+                <img src ="{{photo_100}}">
+                <div class="name">{{first_name}} {{last_name}}</div>
+            </li>
+        {{/each}}`
 
-            VK.Auth.login((response) => {
-                if (response.session) {
-                    resolve(response.session);
-                } else {
-                    reject(new Error('Not logged in'));
-                }
+        var friends_left = document.querySelector('.friends-pick');
+        var templateFn = Handlebars.compile(template);
+
+        function vkApi(method, options) {
+            if (!options.v) {
+                options.v = '5.64';
+            }
+
+            return new Promise((resolve, reject) => {
+                VK.api(method, options, response => {
+                    if (response.error) {
+                        reject(new Error(response.error.error_msg));
+                    } else {
+                        resolve(response);
+                    }
+                })
             })
-        })
-    })
-</script>
+        }
+
+        function vkInit() {
+            return new Promise((resolve, reject)=> {
+                VK.init({
+                    apiId: 6066978
+                });
+
+                VK.Auth.login((response) => {
+                    if (response.session) {
+                        resolve(response.session);
+                    } else {
+                        reject(new Error('Couldn\'t log in'));
+                    }
+                }, 2)
+            })
+        }
+
+        new Promise(resolve => window.onload = resolve)
+        .then(() => vkInit())
+        .then(() => vkApi('friends.get', {fields: 'photo_100'}))
+        .then(result => friends_left.innerHTML = templateFn(result.response));
+
+        friends_left.addEventListener('mousedown', (e) => {
+            var elem = e.target.closest('.draggable');
+            if(!elem) return;
+
+            var coords = getCoords(elem);
+            var shiftX = e.pageX - coords.left;
+            var shiftY = e.pageY - coords.top;
+
+            elem.style.position = 'absolute';
+//            elem.style.width = '400px';
+//            document.body.appendChild(friends_left);
+            moveAt(e);
+
+            elem.style.zIndex = 1000;
+
+            function moveAt(e) {
+                elem.style.left = e.pageX - shiftX +'px';
+                elem.style.top = e.pageY - shiftY +'px';
+            }
+
+            document.addEventListener('mousemove', (e) => {
+                moveAt(e);
+            });
+            document.addEventListener('mouseup', (e) => {
+
+                function findDrop(element) {
+                    element.hidden = true;
+                    var curr_cursor = document.elementFromPoint(event.clientX, event.clientY);
+                    console.log(curr_cursor);
+                    element.hidden = false;
+
+                    if (element == null) {
+                        return null;
+                    }
+
+                    return curr_cursor.closest('.droppable');
+                }
+
+                var drop_elem = findDrop(elem);
+
+                    if(drop_elem) {
+//                        var list = drop_elem.getElementsByTagName('ul');
+                        drop_elem.appendChild(elem);
+                        elem.style.position = 'relative';
+                        elem.style.top = 0;
+                        elem.style.left = 0;
+                        elem = null;
+                    }
+                });
+
+            //ВОПРОС: если ниже код реализовать с addEventListener - фото будет отдельно тянуться
+            elem.ondragstart = function() {
+                return false;
+            }
+        });
+
+        function getCoords(elem) { // кроме IE8-
+            var box = elem.getBoundingClientRect();
+
+            return {
+                top: box.top + pageYOffset,
+                left: box.left + pageXOffset
+            };
+
+        }
+
+    //    function moveAt(e) {
+    //        friends_left.style.left = e.pageX -
+    //    }
+    //
+    //    var dragObject = {};
+    //
+    ////    document.addEventListener('mousemove', (e)=> {
+    ////
+    //////        console.log('Page',e.pageX, e.pageY)
+    //////
+    //////        console.log('Client',e.clientX, e.clientY)
+    ////    })
+    //
+    //    friends_left.addEventListener('mousedown', (e) => {
+    //        var elem = e.target.closest('.draggable');
+    //        if(!elem) return;
+    //
+    //        dragObject.elem = elem;
+    //        dragObject.downX = e.pageX;
+    //        dragObject.downY = e.pageY;
+    //
+    ////        return console.log(dragObject.elem);
+    //    });
+    //
+    //    friends_left.addEventListener('mousemove', (e) => {
+    //        if (!dragObject.elem) return;
+    //
+    //        if (!dragObject.avatar) {
+    //            var moveX = e.pageX - dragObject.downX;
+    //            var moveY = e.pageY - dragObject.downY;
+    //            if (Math.abs(moveX) < 3 && Math.abs(moveY) < 3) {
+    //                return;
+    //            }
+    //
+    //            dragObject.avatar = createAvatar(e);
+    //            if (!dragObject.avatar) {
+    //                dragObject = {};
+    //                return;
+    //            }
+    //            // аватар создан успешно
+    //            // создать вспомогательные свойства shiftX/shiftY
+    //            // Метод Element.getBoundingClientRect() возвращает размер элемента и его позицию относительно окна.
+    //            var coords = getCoords(dragObject.avatar);
+    //            dragObject.shiftX = dragObject.downX - coords.left;
+    //            dragObject.shiftY = dragObject.downY - coords.top;
+    //
+    //            startDrag(e);
+    //        }
+    //
+    //        dragObject.avatar.style.left = e.pageX - dragObject.shiftX + 'px';
+    //        dragObject.avatar.style.top = e.pageY - dragObject.shiftY + 'px';
+    //
+    //        return false;
+    //    })
+    //
+    //    document.addEventListener('mouseup',(e) => {
+    //        if (dragObject.avatar) {
+    //            finishDrag(e);
+    //        }
+    //
+    //        dragObject = {};
+    //    })
+    //
+    //
+    //    function createAvatar(e) {
+    //
+    //        // запомнить старые свойства, чтобы вернуться к ним при отмене переноса
+    //        var avatar = dragObject.elem;
+    //        var old = {
+    //            parent: avatar.parentNode,
+    //            nextSibling: avatar.nextSibling,
+    //            position: avatar.position || '',
+    //            left: avatar.left || '',
+    //            top: avatar.top || '',
+    //            zIndex: avatar.zIndex || ''
+    //        };
+    //
+    //        // функция для отмены переноса
+    //        avatar.rollback = function() {
+    //            old.parent.insertBefore(avatar, old.nextSibling);
+    //            avatar.style.position = old.position;
+    //            avatar.style.left = old.left;
+    //            avatar.style.top = old.top;
+    //            avatar.style.zIndex = old.zIndex
+    //        };
+    //
+    //        return avatar;
+    //    }
+    //
+    //    function startDrag(e) {
+    //        var avatar = dragObject.avatar;
+    //
+    //        document.body.appendChild(avatar);
+    //        avatar.style.zIndex = 9999;
+    //        avatar.style.position = 'absolute';
+    //    }
+    //
+    //
+    //    function finishDrag(e) {
+    //        var dropElem = findDroppable(e);
+    //
+    //        if (!dropElem) {
+    //            onDragCancel(dragObject);
+    //        } else {
+    //            onDragEnd(dragObject, dropElem);
+    //        }
+    //    }
+    //
+    //    var onDragEnd = function(dragObject, dropElem) {};
+    //    var onDragCancel = function(dragObject) {};
+    //
+    //    function findDroppable(event) {
+    //        dragObject.avatar.hidden = true;
+    //        var elem = document.elementFromPoint(event.clientX, event.clientY);
+    //        dragObject.avatar.hidden = false;
+    //        if (elem == null) {
+    //            return null;
+    //        }
+    //        return elem.closest('.droppable');
+    //    }
+    //
+    //
+    //    friends_left.addEventListener('mousemove', (e) => {
+    //        if (!dragObject.elem) return;
+    //
+    //        if (!dragObject.avatar) {
+    //            var moveX = e.pageX - dragObject.downX;
+    //            var moveY = e.pageY - dragObject.downY;
+    //            if (Math.abs(moveX) < 3 && Math.abs(moveY) < 3) {
+    //                return;
+    //            }
+    //
+    //            dragObject.avatar = createAvatar(e);
+    //            if (!dragObject.avatar) {
+    //                dragObject = {};
+    //                return;
+    //            }
+    //            // аватар создан успешно
+    //            // создать вспомогательные свойства shiftX/shiftY
+    //            var coords = getCoords(dragObject.avatar);
+    //            dragObject.shiftX = dragObject.downX - coords.left;
+    //            dragObject.shiftY = dragObject.downY - coords.top;
+    //
+    //            startDrag(e);
+    //        }
+    //
+    //        dragObject.avatar.style.left = e.pageX - dragObject.shiftX + 'px';
+    //        dragObject.avatar.style.top = e.pageY - dragObject.shiftY + 'px';
+    //
+    //        return false;
+    //    })
+
+
+    </script>
 </body>
 </html>
