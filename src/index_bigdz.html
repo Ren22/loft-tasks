@@ -58,9 +58,9 @@
             left_input.addEventListener('keyup', (e) => {
             return new Promise ((resolve, reject) => {
                 var get_lst = document.querySelector('.lft_list').children;
-                get_lst = Array.from(get_lst);
                 var all_names = [];
 
+                get_lst = Array.from(get_lst);
                 get_lst.forEach(i => {
                     var name_elem = i.querySelector('.name');
                     all_names.push(name_elem.innerText);
