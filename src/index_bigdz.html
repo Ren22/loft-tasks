@@ -5,32 +5,51 @@
     <title>FriendsFilter</title>
     <style type="text/css">
         .main-container{
-            display: flex;
+            /*display: flex;*/
         }
 
         .friends {
-            position: relative;
-            flex-basis: 400px;
-            position: relative;
+            width: 400px;
             outline: 1px solid red;
+            height: 500px;
+            overflow-y: scroll;
         }
 
-        ul.friends-pick, li {
-            max-height: 400px;
-            overflow-y:auto;
+        ul {
+            width: 400px;
+            height: 500px; /* если задать div-у сверху то выйдет за границы */
+            overflow-y: scroll;
             list-style: none;
             margin: 0;
             padding: 0;
             outline: 1px solid red;
         }
+        ul li {
+            border: 1px solid lightgrey;
+            width: inherit;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
     </style>
     <script src="https://vk.com/js/api/openapi.js?146" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
 </head>
 <body>
     <div class="main-container">
-        <div class="friends"><ul class="friends-pick"></ul></div>
-        <div class="friends droppable"><ul class="friends-pick"></ul></div>
+        <table>
+            <tr><td><input type="text" name="name_search"></td>
+                <td><input type="text" name="name_search"></td>
+            </tr>
+            <tr><td class="friends"><ul class="friends-pick"></ul></td>
+                <td class="friends"><ul class="friends-pick droppable"></ul></td>
+            </tr>
+        </table>
+        <!--<input type="text" name="name_search">-->
+        <!--<div class="friends"><ul class="friends-pick"></ul></div>-->
+        <!--<div class="friends droppable"><ul class="friends-pick"></ul></div>-->
     </div>
 
     <script>
@@ -128,6 +147,7 @@
                         elem.style.position = 'relative';
                         elem.style.top = 0;
                         elem.style.left = 0;
+                        elem.style.zIndex = -1;
                         elem = null;
                     }
                 });
@@ -145,162 +165,7 @@
                 top: box.top + pageYOffset,
                 left: box.left + pageXOffset
             };
-
         }
-
-    //    function moveAt(e) {
-    //        friends_left.style.left = e.pageX -
-    //    }
-    //
-    //    var dragObject = {};
-    //
-    ////    document.addEventListener('mousemove', (e)=> {
-    ////
-    //////        console.log('Page',e.pageX, e.pageY)
-    //////
-    //////        console.log('Client',e.clientX, e.clientY)
-    ////    })
-    //
-    //    friends_left.addEventListener('mousedown', (e) => {
-    //        var elem = e.target.closest('.draggable');
-    //        if(!elem) return;
-    //
-    //        dragObject.elem = elem;
-    //        dragObject.downX = e.pageX;
-    //        dragObject.downY = e.pageY;
-    //
-    ////        return console.log(dragObject.elem);
-    //    });
-    //
-    //    friends_left.addEventListener('mousemove', (e) => {
-    //        if (!dragObject.elem) return;
-    //
-    //        if (!dragObject.avatar) {
-    //            var moveX = e.pageX - dragObject.downX;
-    //            var moveY = e.pageY - dragObject.downY;
-    //            if (Math.abs(moveX) < 3 && Math.abs(moveY) < 3) {
-    //                return;
-    //            }
-    //
-    //            dragObject.avatar = createAvatar(e);
-    //            if (!dragObject.avatar) {
-    //                dragObject = {};
-    //                return;
-    //            }
-    //            // аватар создан успешно
-    //            // создать вспомогательные свойства shiftX/shiftY
-    //            // Метод Element.getBoundingClientRect() возвращает размер элемента и его позицию относительно окна.
-    //            var coords = getCoords(dragObject.avatar);
-    //            dragObject.shiftX = dragObject.downX - coords.left;
-    //            dragObject.shiftY = dragObject.downY - coords.top;
-    //
-    //            startDrag(e);
-    //        }
-    //
-    //        dragObject.avatar.style.left = e.pageX - dragObject.shiftX + 'px';
-    //        dragObject.avatar.style.top = e.pageY - dragObject.shiftY + 'px';
-    //
-    //        return false;
-    //    })
-    //
-    //    document.addEventListener('mouseup',(e) => {
-    //        if (dragObject.avatar) {
-    //            finishDrag(e);
-    //        }
-    //
-    //        dragObject = {};
-    //    })
-    //
-    //
-    //    function createAvatar(e) {
-    //
-    //        // запомнить старые свойства, чтобы вернуться к ним при отмене переноса
-    //        var avatar = dragObject.elem;
-    //        var old = {
-    //            parent: avatar.parentNode,
-    //            nextSibling: avatar.nextSibling,
-    //            position: avatar.position || '',
-    //            left: avatar.left || '',
-    //            top: avatar.top || '',
-    //            zIndex: avatar.zIndex || ''
-    //        };
-    //
-    //        // функция для отмены переноса
-    //        avatar.rollback = function() {
-    //            old.parent.insertBefore(avatar, old.nextSibling);
-    //            avatar.style.position = old.position;
-    //            avatar.style.left = old.left;
-    //            avatar.style.top = old.top;
-    //            avatar.style.zIndex = old.zIndex
-    //        };
-    //
-    //        return avatar;
-    //    }
-    //
-    //    function startDrag(e) {
-    //        var avatar = dragObject.avatar;
-    //
-    //        document.body.appendChild(avatar);
-    //        avatar.style.zIndex = 9999;
-    //        avatar.style.position = 'absolute';
-    //    }
-    //
-    //
-    //    function finishDrag(e) {
-    //        var dropElem = findDroppable(e);
-    //
-    //        if (!dropElem) {
-    //            onDragCancel(dragObject);
-    //        } else {
-    //            onDragEnd(dragObject, dropElem);
-    //        }
-    //    }
-    //
-    //    var onDragEnd = function(dragObject, dropElem) {};
-    //    var onDragCancel = function(dragObject) {};
-    //
-    //    function findDroppable(event) {
-    //        dragObject.avatar.hidden = true;
-    //        var elem = document.elementFromPoint(event.clientX, event.clientY);
-    //        dragObject.avatar.hidden = false;
-    //        if (elem == null) {
-    //            return null;
-    //        }
-    //        return elem.closest('.droppable');
-    //    }
-    //
-    //
-    //    friends_left.addEventListener('mousemove', (e) => {
-    //        if (!dragObject.elem) return;
-    //
-    //        if (!dragObject.avatar) {
-    //            var moveX = e.pageX - dragObject.downX;
-    //            var moveY = e.pageY - dragObject.downY;
-    //            if (Math.abs(moveX) < 3 && Math.abs(moveY) < 3) {
-    //                return;
-    //            }
-    //
-    //            dragObject.avatar = createAvatar(e);
-    //            if (!dragObject.avatar) {
-    //                dragObject = {};
-    //                return;
-    //            }
-    //            // аватар создан успешно
-    //            // создать вспомогательные свойства shiftX/shiftY
-    //            var coords = getCoords(dragObject.avatar);
-    //            dragObject.shiftX = dragObject.downX - coords.left;
-    //            dragObject.shiftY = dragObject.downY - coords.top;
-    //
-    //            startDrag(e);
-    //        }
-    //
-    //        dragObject.avatar.style.left = e.pageX - dragObject.shiftX + 'px';
-    //        dragObject.avatar.style.top = e.pageY - dragObject.shiftY + 'px';
-    //
-    //        return false;
-    //    })
-
-
     </script>
 </body>
 </html>
