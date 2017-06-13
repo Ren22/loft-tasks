@@ -41,38 +41,21 @@
     <div class="main-container">
         <table>
             <tr><td><input type="text" class="lft_inpt" name="name_search"></td>
-                <td><input type="text" class="lkovr_rght_lst" name="name_search"></td>
+                <td><input type="text" class="rght_inpt" name="name_search"></td>
             </tr>
-            <tr><td class="friends"><ul class="lft_list friends-pick"></ul></td>
-                <td class="friends"><ul class="rght_list friends-pick droppable"></ul></td>
+            <tr><td class="friends"><ul class="friends-left"></ul></td>
+                <td class="friends"><ul class="friends-right droppable"></ul></td>
             </tr>
         </table>
         <!--<input type="text" name="name_search">-->
         <!--<div class="friends"><ul class="friends-pick"></ul></div>-->
         <!--<div class="friends droppable"><ul class="friends-pick"></ul></div>-->
     </div>
+
     <script>
-        var left_input = document.querySelector('.lft_inpt');
-        var chunk = left_input.value;
-
-            left_input.addEventListener('keyup', (e) => {
-            return new Promise ((resolve, reject) => {
-                var get_lst = document.querySelector('.lft_list').children;
-                var all_names = [];
-
-                get_lst = Array.from(get_lst);
-                get_lst.forEach(i => {
-                    var name_elem = i.querySelector('.name');
-                    all_names.push(name_elem.innerText);
-                })
-                resolve(all_names);
-            })
-                .then ((all_names => {
-
-                }))
-        })
-    </script>
-    <script>
+        /******************
+         * VK.com connection
+         ******************/
 
         var template = `
         {{#each items}}
@@ -82,7 +65,8 @@
             </li>
         {{/each}}`
 
-        var friends_left = document.querySelector('.friends-pick');
+        var friends_left = document.querySelector('.friends-left');
+        var friends_right = document.querySelector('.friends-pick');
         var templateFn = Handlebars.compile(template);
 
         function vkApi(method, options) {
@@ -122,6 +106,10 @@
         .then(() => vkApi('friends.get', {fields: 'photo_100'}))
         .then(result => friends_left.innerHTML = templateFn(result.response));
 
+        /******************
+         * Drag'n'drop
+         ******************/
+
         friends_left.addEventListener('mousedown', (e) => {
             var elem = e.target.closest('.draggable');
             if(!elem) return;
@@ -136,32 +124,32 @@
             elem.style.zIndex = 1000;
 
             function moveAt(e) {
-                elem.style.left = e.pageX - shiftX +'px';
-                elem.style.top = e.pageY - shiftY +'px';
+                if (elem) {
+                    elem.style.left = e.pageX - shiftX + 'px';
+                    elem.style.top = e.pageY - shiftY + 'px';
+                }
             }
 
             document.addEventListener('mousemove', (e) => {
                 moveAt(e);
             });
-            document.addEventListener('mouseup', () => {
 
-                function findDrop(element) {
-                    element.hidden = true;
-                    var curr_cursor = document.elementFromPoint(event.clientX, event.clientY);
-                    console.log(curr_cursor);
-                    element.hidden = false;
-
-                    if (element == null) {
-                        return null;
-                    }
-
-                    return curr_cursor.closest('.droppable');
-                }
+            document.addEventListener('mouseup', (e) => {
 
                 var drop_elem = findDrop(elem);
 
+                function findDrop(element) {
+                    if (element) {
+                        element.hidden = true;
+                        var curr_cursor = document.elementFromPoint(event.clientX, event.clientY);
+                        console.log(curr_cursor);
+                        element.hidden = false;
+
+                        return curr_cursor.closest('.droppable');
+                    }
+                }
+
                     if(drop_elem) {
-//                        var list = drop_elem.getElementsByTagName('ul');
                         drop_elem.appendChild(elem);
                         elem.style.position = 'relative';
                         elem.style.top = 0;
@@ -185,6 +173,77 @@
                 left: box.left + pageXOffset
             };
         }
+
+        function isMatching(full, chunk) {
+            full = full.toLowerCase();
+            chunk = chunk.toLowerCase();
+            if (~full.indexOf(chunk)) {
+
+                return true;
+            } else {
+
+                return false;
+            }
+        }
+
+        /******************
+         * Search for user in a list
+         ******************/
+
+
+        var left_input = document.querySelector('.lft_inpt');
+        var right_input = document.querySelector('.rght_inpt');
+
+        left_input.addEventListener('keyup', (e) => {
+            var chunk = left_input.value;
+            var picked_names = [];
+            var get_lst = document.querySelector('.friends-left').children;
+
+            chunk = chunk.replace(/\s/g, '');
+            get_lst = Array.from(get_lst);
+            if (chunk != '') {
+                get_lst.forEach(i => { //every i is li element
+                    var elem_name = i.querySelector('.name').innerText;
+
+                    i.hidden = true; //make all elements from the initial list hidden
+                    elem_name = elem_name.replace(/\s/g, '');
+                    if (isMatching(elem_name, chunk)) {
+                        i.hidden = false; //show only those that appear in search input
+                        picked_names.push(i);
+                    }
+                })
+            } else {
+                get_lst.forEach(i => {
+                    i.hidden = false;
+                })
+            }
+        })
+
+        right_input.addEventListener('keyup', (e) => {
+            var chunk = right_input.value;
+            var picked_names = [];
+            var get_lst = document.querySelector('.friends-right').children;
+
+            chunk = chunk.replace(/\s/g, '');
+            get_lst = Array.from(get_lst);
+            if (chunk != '') {
+                get_lst.forEach(i => { //every i is li element
+                    var elem_name = i.querySelector('.name').innerText;
+
+                    i.hidden = true; //make all elements from the initial list hidden
+                    elem_name = elem_name.replace(/\s/g, '');
+                    if (isMatching(elem_name, chunk)) {
+                        i.hidden = false; //show only those that appear in search input
+                        picked_names.push(i);
+                    }
+                })
+            } else {
+                get_lst.forEach(i => {
+                    i.hidden = false;
+                })
+            }
+        })
+
     </script>
 </body>
 </html>
