@@ -36,39 +36,62 @@
             float: left;
         }
 
-        /*.draggable::before {*/
-            /*content: "";*/
-            /*position: absolute;*/
-            /*top: 50%;*/
-            /*transform: translateY(-50%);*/
-            /*right: 15px;*/
-            /*width: 15px;*/
-
-            /*border: 2px solid red;*/
-        /*}*/
-
-        /*.draggable::after {*/
-            /*content: "";*/
-            /*position: absolute;*/
-            /*top: 50%;*/
-            /*transform: translateY(-50%);*/
-            /*!*transform: rotate(90deg);*!*/
-            /*right: 22px;*/
-            /*height: 15px;*/
-
-            /*border: 2px solid red;*/
-        /*}*/
-
-        .add_remove {
+        .add_remove_left {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            right: 20px;
+            right: 15px;
             width: 20px;
-            height: 20px;
-            background: url('http://www.iconsdb.com/icons/download/gray/plus-multi-size.ico') no-repeat;
-            background-size: 20px;
+            height:20px;
+            z-index: 1000;
             cursor: pointer;
+        }
+
+        .add_remove_left::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            z-index: -1;
+
+            border: 2px solid red;
+         }
+
+        .add_remove_left::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 8px;
+            height: 15px;
+            z-index: -1;
+
+            border: 2px solid red;
+        }
+
+        .add_remove_right::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            transform: rotate(45deg);
+            right: 15px;
+            width: 15px;
+            cursor: pointer;
+            border: 2px solid red;
+        }
+
+        .add_remove_right::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            transform: rotate(-45deg);
+            right: 15px;
+            width: 15px;
+            cursor: pointer;
+            border: 2px solid red;
         }
 
         table {
@@ -104,12 +127,12 @@
             <li class="draggable">
                 <img class="photo" src ="{{photo_100}}">
                 <div class="name">{{first_name}} {{last_name}}</div>
-                <div class="add_remove"></div>
+                <div class="add_remove_left"></div>
             </li>
         {{/each}}`
 
         var friendsLeft = document.querySelector('.friends-left');
-        var friends_right = document.querySelector('.friends-pick');
+        var friendsRight = document.querySelector('.friends-right');
         var templateFn = Handlebars.compile(template);
 
         function vkApi(method, options) {
@@ -145,66 +168,76 @@
         }
 
         new Promise(resolve => window.onload = resolve)
-        .then(() => vkInit())ee
+        .then(() => vkInit())
         .then(() => vkApi('friends.get', {fields: 'photo_100'}))
         .then(result => friendsLeft.innerHTML = templateFn(result.response))
         .then(()=> {
+
             /******************
-             * Drag'n'drop
+             * Drag'n'drop ****
              ******************/
 
-//            friendsLeft.addEventListener('mousedown', (e) => {
-//                var elem = e.target.closest('.draggable');
-//                if(!elem) return;
-//
-//                var coords = getCoords(elem);
-//                var shiftX = e.pageX - coords.left;
-//                var shiftY = e.pageY - coords.top;
-//
-//                elem.style.position = 'absolute';
-//                moveAt(e);
-//
-//                elem.style.zIndex = 1000;
-//
-//                function moveAt(e) {
-//                    if (elem) {
-//                        elem.style.left = e.pageX - shiftX + 'px';
-//                        elem.style.top = e.pageY - shiftY + 'px';
-//                    }
-//                }
-//
-//                document.addEventListener('mousemove', (e) => {
-//                    moveAt(e);
-//                });
-//
-//                document.addEventListener('mouseup', (e) => {
-//
-//                    var dropElem = findDrop(elem);
-//
-//                    function findDrop(element) {
-//                        if (element) {
-//                            element.style.display = 'none';
-//                            var curr_cursor = document.elementFromPoint(event.clientX, event.clientY);
-//                            console.log(curr_cursor);
-//                            element.style.display = 'inline-block';
-//
-//                            return curr_cursor.closest('.droppable');
-//                        }
-//                    }
-//
-//                        if(dropElem) {
-////                            var elemStyle = document.head.appendChild(document.createElement('style'));
-//                            elem.style = 0;
-//                            dropElem.appendChild(elem);
-//                            elem = null;
-//                        }
-//                    });
-//
-//                //ВОПРОC>>??: если ниже код реализовать с addEventListener - фото будет отдельно тянуться
-//                elem.ondragstart = function() {
-//                    return false;
-//                }
-//            });
+            friendsLeft.addEventListener('mousedown', (e) => {
+                var elem = e.target.closest('.draggable');
+
+                if(!elem) return;
+                if (e.target.className == 'add_remove_left') {
+                    e.target.className = 'add_remove_right';
+                    document.querySelector('.friends-right').appendChild(elem);
+                    elem = null;
+                    return;
+                }
+
+                var coords = getCoords(elem);
+                var shiftX = e.pageX - coords.left;
+                var shiftY = e.pageY - coords.top;
+
+                elem.style.position = 'absolute';
+                moveAt(e);
+
+                elem.style.zIndex = 1000;
+
+                function moveAt(e) {
+                    if (elem) {
+                        elem.style.left = e.pageX - shiftX + 'px';
+                        elem.style.top = e.pageY - shiftY + 'px';
+                    }
+                }
+
+                document.addEventListener('mousemove', (e) => {
+                    moveAt(e);
+                });
+
+                document.addEventListener('mouseup', (e) => {
+
+                    var dropElem = findDrop(elem);
+
+                    function findDrop(element) {
+                        if (element) {
+                            element.style.display = 'none';
+                            var curr_cursor = document.elementFromPoint(event.clientX, event.clientY);
+                            console.log(curr_cursor);
+                            element.style.display = 'inline-block';
+
+                            return curr_cursor.closest('.droppable');
+                        }
+                    }
+
+                        if(dropElem && elem) {
+                            elem.style = 0;
+                            dropElem.appendChild(elem);
+                            if (!elem.querySelector('.add_remove_right')) {
+                                elem.querySelector('.add_remove_left').className = 'add_remove_right';
+                            }
+                            elem = null;
+                        }
+                    });
+
+                //ВОПРОC>>??: если ниже код реализовать с addEventListener - фото будет отдельно тянуться
+                elem.ondragstart = function() {
+                    return false;
+                }
+            });
 
             function getCoords(elem) { // кроме IE8-
                 var box = elem.getBoundingClientRect();
@@ -215,11 +248,15 @@
                 };
             }
 
-            function isMatching(full, chunk) {
-                full = full.toLowerCase();
-                chunk = chunk.toLowerCase();
-                if (~full.indexOf(chunk)) { return true; } else { return false; }
-            }
+            friendsRight.addEventListener('click', (e) => {
+                if (e.target.className == 'add_remove_right') {
+                    var elem = e.target.closest('.draggable');
+                    friendsLeft.appendChild(elem);
+
+                    return;
+                }
+            }, false);
+
 
             /******************
              * Search for user in a list
@@ -275,17 +312,14 @@
                 }
             })
 
-            /******************
-             * Catch add / remove
-             ******************/
+            function isMatching(full, chunk) {
+                full = full.toLowerCase();
+                chunk = chunk.toLowerCase();
+                if (~full.indexOf(chunk)) { return true; } else { return false; }
+            }
 
-            var add = document.querySelector('.add_remove');
-
-            add.addEventListener('click', (e) => {
-                var elem = e.target.closest('.draggable');
-                document.querySelector('.friends-right').appendChild(elem);
-            })
         })
+
     </script>
 </body>
 </html>
