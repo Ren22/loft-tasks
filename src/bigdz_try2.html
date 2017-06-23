@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FriendsFilter</title>
+    <style type="text/css">
+        .main-container{
+            /*display: flex;*/
+        }
+
+        .friends {
+            width: 400px;
+            outline: 1px solid red;
+            height: 500px;
+            overflow-y: scroll;
+        }
+
+        ul {
+            width: 400px;
+            height: 500px; /* если задать div-у сверху то выйдет за границы */
+            overflow-y: scroll;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            outline: 1px solid red;
+        }
+
+        ul li {
+            display: inline-block;
+            position: relative;
+            border: 1px solid lightgrey;
+            width: inherit;
+        }
+
+        .photo {
+            float: left;
+        }
+
+        .add_remove_left {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 15px;
+            width: 20px;
+            height:20px;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .add_remove_left::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            z-index: -1;
+
+            border: 2px solid red;
+        }
+
+        .add_remove_left::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 8px;
+            height: 15px;
+            z-index: -1;
+
+            border: 2px solid red;
+        }
+
+        .add_remove_right::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            transform: rotate(45deg);
+            right: 15px;
+            width: 15px;
+            cursor: pointer;
+            border: 2px solid red;
+        }
+
+        .add_remove_right::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            transform: rotate(-45deg);
+            right: 15px;
+            width: 15px;
+            cursor: pointer;
+            border: 2px solid red;
+        }
+
+        table {
+            border-collapse: collapse;
+        }
+
+    </style>
+    <script src="https://vk.com/js/api/openapi.js?146" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
+</head>
+<body>
+<div class="main-container">
+    <table>
+        <tr><td><input type="text" class="lft_inpt" name="name_search"></td>
+            <td><input type="text" class="rght_inpt" name="name_search"></td>
+        </tr>
+        <tr><td class="friends"><ul class="friends-left"></ul></td>
+            <td class="friends"><ul class="friends-right droppable"></ul></td>
+        </tr>
+        <tr><td><button name ="user_lists" class="save_users">Сохранить</button></td></tr>
+    </table>
+    <!--<input type="text" name="name_search">-->
+    <!--<div class="friends"><ul class="friends-pick"></ul></div>-->
+    <!--<div class="friends droppable"><ul class="friends-pick"></ul></div>-->
+</div>
+<script>
+    /******************
+     * VK.com connection
+     ******************/
+    function render(listToRender, whereToAppend) {
+        var list = {
+            ofFriends: listToRender
+        };
+        var template =`
+            {{#each ofFriends}}
+                <li class="draggable" id="{{id}}">
+                    <img class="photo" src ="{{photo}}">
+                    <div class="name">{{name}} {{surname}}</div>
+                    <div class="{{style}}"></div>
+                </li>
+            {{/each}}`;
+        var templateFn = Handlebars.compile(template);
+
+        whereToAppend.innerHTML = templateFn(list);
+    };
+    function vkApi(method, options) {
+        if (!options.v) {
+            options.v = '5.64';
+        }
+
+        return new Promise((resolve, reject) => {
+            VK.api(method, options, response => {
+                if (response.error) {
+                    reject(new Error(response.error.error_msg));
+                } else {
+                    resolve(response);
+                }
+            })
+        })
+    };
+    function vkInit() {
+        return new Promise((resolve, reject)=> {
+            VK.init({
+                apiId: 6066978
+            });
+
+            VK.Auth.login((response) => {
+                if (response.session) {
+                    resolve(response.session);
+                } else {
+                    reject(new Error('Couldn\'t log in'));
+                }
+            }, 2)
+        })
+    };
+    new Promise(resolve => window.onload = resolve)
+        .then(() => vkInit())
+        .then(() => vkApi('friends.get', {fields: 'photo_100'}))
+        .then(result => {
+            return new Promise((resolve, reject) => {
+                var friends = {
+                    justFriends: [],
+                    chosenFriends: []
+                };
+
+                result.response.items.forEach(i => {
+                    var currName = new Friend(i.first_name, i.last_name, i.photo_100, i.id)
+                    friends.justFriends .push(currName);
+                })
+
+                function Friend(name, surname, photo, id) {
+                    this.name = name;
+                    this.surname = surname;
+                    this.photo = photo;
+                    this.id = id;
+                    this.style = 'add_remove_left';
+                }
+
+                if ((localStorage.leftList) || (localStorage.rightList)) {
+                    friends.justFriends = JSON.parse(localStorage.leftList);
+                    friends.chosenFriends = JSON.parse(localStorage.rightList);
+                }
+
+                render(friends.justFriends, document.querySelector('.friends-left'));
+                render(friends.chosenFriends, document.querySelector('.friends-right'));
+                resolve(friends);
+            })
+        })
+        .then(friends => {
+            var leftInput = document.querySelector('.lft_inpt');
+            var rightInput = document.querySelector('.rght_inpt');
+            var friendsLeft = document.querySelector('.friends-left');
+            var friendsRight = document.querySelector('.friends-right');
+            var saveLists = document.querySelector('.save_users');
+
+            function deleteAdd(itemToDeleteAdd) {
+                var getId = itemToDeleteAdd.getAttribute('id');
+                friends.justFriends.forEach((item, i) => {
+                    if (item.id == getId) {
+                        friends.justFriends.splice(i, 1);
+                        item.style = 'add_remove_right';
+                        friends.chosenFriends.push(item);
+                        render(friends.justFriends, friendsLeft);
+                        render(friends.chosenFriends, friendsRight);
+                    };
+                });
+            };
+            function deleteAddReverse(itemToDeleteAdd) {
+                var getId = itemToDeleteAdd.getAttribute('id');
+                friends.chosenFriends.forEach((item, i) => {
+                    if (item.id == getId) {
+                        friends.chosenFriends.splice(i, 1);
+                        item.style = 'add_remove_left';
+                        friends.justFriends.push(item);
+                        render(friends.justFriends, friendsLeft);
+                        render(friends.chosenFriends, friendsRight);
+                        console.log(item);
+                    };
+                });
+            };
+            function getCoords(elem) { // кроме IE8-
+                var box = elem.getBoundingClientRect();
+
+                return {
+                    top: box.top + pageYOffset,
+                    left: box.left + pageXOffset
+                };
+            };
+            function filterFriend(chunk, listOfFriends) {
+                var pickedNames = [];
+
+                listOfFriends.forEach(listName => {
+                    if (isMatching(chunk, listName)) {
+                        pickedNames.push(listName);
+                    }
+                })
+
+                function isMatching(chunk, listName) {
+                    chunk = chunk.toLowerCase();
+
+                    var Name = listName.name.toLowerCase();
+                    var Surname = listName.surname.toLowerCase();
+                    if ((~Name.indexOf(chunk)) || (~Surname.indexOf(chunk))) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+                return pickedNames;
+            };
+
+            leftInput.addEventListener('keyup', (e) => {
+                var chunk = leftInput.value;
+
+                chunk = chunk.replace(/\s/g, '');
+                render(filterFriend(chunk, friends.justFriends), friendsLeft);
+            });
+            rightInput.addEventListener('keyup', (e) => {
+                var chunk = rightInput.value;
+
+                chunk = chunk.replace(/\s/g, '');
+                render(filterFriend(chunk, friends.chosenFriends), friendsRight)
+            });
+            friendsLeft.addEventListener('mousedown', (e) => {
+                var elem = e.target.closest('.draggable');
+                var coords = getCoords(elem);
+                var shiftX = e.pageX - coords.left;
+                var shiftY = e.pageY - coords.top;
+
+                function moveAt(e) {
+                    if (elem) {
+                        elem.style.left = e.pageX - shiftX + 'px';
+                        elem.style.top = e.pageY - shiftY + 'px';
+                    }
+                }
+
+                if(!elem) return;
+                if (e.target.className == 'add_remove_left') {
+                    deleteAdd(e.target.parentElement);
+                }
+
+                elem.style.position = 'absolute';
+                elem.style.zIndex = 1000;
+
+                moveAt(e);
+
+                document.addEventListener('mousemove', (e) => {
+                    moveAt(e);
+                });
+
+                document.addEventListener('mouseup', (e) => {
+                    var dropElem = findDrop(elem);
+
+                    function findDrop(element) {
+                        if (element) {
+                            element.style.display = 'none';
+                            var curr_cursor = document.elementFromPoint(event.clientX, event.clientY);
+                            element.style.display = 'inline-block';
+
+                            return curr_cursor.closest('.droppable');
+                        }
+                    }
+
+                    if(dropElem) {
+                        elem.style = 0;
+                        deleteAdd(elem);
+                        elem = null;
+                    }
+                });
+
+                //ВОПРОC>>??: если ниже код реализовать с addEventListener - фото будет отдельно тянуться
+                elem.ondragstart = function() {
+                    return false;
+                }
+            });
+            friendsRight.addEventListener('click', (e) => {
+                console.log(e.target.className);
+                if (e.target.className == 'add_remove_right') {
+                    deleteAddReverse(e.target.parentElement);
+                }
+            });
+            saveLists.addEventListener('click', (e) => {
+                localStorage.leftList = JSON.stringify(friends.justFriends );
+                localStorage.rightList = JSON.stringify(friends.chosenFriends);
+            });
+        })
+</script>
+</body>
+</html>

@@ -111,6 +111,7 @@
             <tr><td class="friends"><ul class="friends-left"></ul></td>
                 <td class="friends"><ul class="friends-right droppable"></ul></td>
             </tr>
+            <tr><td><button name ="user_lists" class="save_users">Сохранить</button></td></tr>
         </table>
         <!--<input type="text" name="name_search">-->
         <!--<div class="friends"><ul class="friends-pick"></ul></div>-->
@@ -223,7 +224,7 @@
                         }
                     }
 
-                        if(dropElem && elem) {
+                        if(dropElem) {
                             elem.style = 0;
                             dropElem.appendChild(elem);
                             if (!elem.querySelector('.add_remove_right')) {
