@@ -19,25 +19,32 @@
             width: 200px;
             height: 450px;
             outline: 1px solid red;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
     <div id="map"></div>
-    <script src="model.js"></script>
-    <script src="view.js"></script>
     <script type = "text/x-handlebars-template" id="inputTemplate">
-        <!--<div class = "input">-->
-            <!--<div class="address">{{address}}</div>-->
+        <div class = "input">
+            <div class="address">{{address}}</div>
             <!--<div class="feedbacks">{{feedbacks}}</div>-->
-            <!--<input type="text" name="username">-->
-            <!--<input type="text" name="place">-->
-            <!--<textarea placeholder="Your opinion matters!"></textarea>-->
-            <!--<input type="submit" name="Add">-->
-        <!--</div>-->
+            <input type="text" name="username">
+            <input type="text" name="place">
+            <textarea rows="4" cols="50" style="margin-top: 10px" placeholder="Your opinion matters!"></textarea>
+            <input type="submit">
+        </div>
     </script>
+    <script>
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
     <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAO3v5flib0-X7ZcgjT0wu2lhLYaLEZ9qY&callback=initMap">
     </script>
+    <script src="initmap.js"></script>
+    <script src="model.js"></script>
+    <script src="view.js"></script>
+    <script src="controller.js"></script>
 </body>
 </html>
