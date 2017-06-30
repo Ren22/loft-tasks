@@ -8,7 +8,8 @@ function initMap() {
 
     //Если вынести map.addListener то не сработает из-за scope?
     map.addListener('click', function (e) {
-        console.log(Controller.addressAndFeeds(geocoder, map, e))
+        // console.log(Controller.addressAndFeeds(geocoder, map, e))
+        Controller.addressAndFeeds(geocoder, map, e)
         var contentString = Controller.addressAndFeeds(geocoder, map, e);
     })
 }

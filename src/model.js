@@ -15,10 +15,10 @@ var Model = {
                         // console.log(results[1].formatted_address);
                         resolve(results[1].formatted_address);
                     } else {
-                        reject(window.alert('No results founds!'));
+                        reject(new Error('No results found!'));
                     }
                 } else {
-                    reject(window.alert('Geocoder failed due to: ' + status));
+                    reject(new Error('No results found!'));
                 }
             });
         })
