@@ -5,9 +5,9 @@ var Model = {
             map: map
         })
     },
-    getPlace: function (geocoder, map, coords) {
+    getPlace: function (geocoder, map, latlng) {
         return new Promise((resolve, reject) => {
-            var latlng = { lat: coords.latLng.lat(), lng: coords.latLng.lng() };
+            // var latlng = { lat: coords.latLng.lat(), lng: coords.latLng.lng() };
 
             geocoder.geocode({'location': latlng}, function (results, status) {
                 if (status === 'OK') {
@@ -23,21 +23,6 @@ var Model = {
             });
         })
     }
-    // getPlace: function (geocoder, map, coords) {
-    //     var latlng = { lat: coords.latLng.lat(), lng: coords.latLng.lng() };
-    //
-    //     geocoder.geocode({'location': latlng}, function (results, status) {
-    //         if (status === 'OK') {
-    //             if (results[1]) {
-    //                 console.log(results[1].formatted_address);
-    //             } else {
-    //                 window.alert('No results founds!');
-    //             }
-    //         } else {
-    //             window.alert('Geocoder failed due to: ' + status);
-    //         }
-    //     });
-    //
-    // }
+
 }
 

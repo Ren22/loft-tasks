@@ -1,8 +1,11 @@
 var Controller = {
-    addressAndFeeds: function (geocoder, map, e) {
-        Model.getPlace(geocoder, map, e).then((response) => {
-            console.log(View.pastePlace('inputTemplate', response))
-            View.pastePlace('inputTemplate', response);
+    addressAndFeeds: function (geocoder, map, latlng) {
+        return new Promise((resolve, reject) => {
+            Model.getPlace(geocoder, map, latlng).then((response) => {
+                var output = View.pastePlace('inputTemplate', response);
+                resolve(output);
+                // console.log(output)
+            })
         })
     }
 }

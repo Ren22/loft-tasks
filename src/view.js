@@ -12,9 +12,6 @@ var View = {
             address: address
         }
 
-        // console.log(addressToPass)
-        // console.log(renderFn(addressToPass))
-
         return renderFn(addressToPass);
     }
 }
