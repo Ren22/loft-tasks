@@ -1,11 +1,23 @@
 var Controller = {
-    addressAndFeeds: function (geocoder, map, latlng) {
+    address: function (geocoder, map, latlng) {
         return new Promise((resolve, reject) => {
             Model.getPlace(geocoder, map, latlng).then((response) => {
                 var output = View.pastePlace('inputTemplate', response);
                 resolve(output);
                 // console.log(output)
             })
+        })
+    },
+    feedback: function (input) {
+        return new Promise((resolve, reject) => {
+            var output = View.pasteFeedbackData('feedbackTemplate', input);
+            resolve(output);
+        })
+    },
+    sliderFeedbacks: function (allClusterFeedbacks) {
+        return new Promise((resolve, reject) => {
+            var output = View.pasteClusterFeedacks('sliderTemplate', allClusterFeedbacks);
+            resolve(output);
         })
     }
 }
