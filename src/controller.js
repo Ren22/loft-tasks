@@ -14,6 +14,12 @@ var Controller = {
             resolve(output);
         })
     },
+    eachSliderFeedback: function (input) {
+        return new Promise((resolve, reject) => {
+            var output = View.pasteFeedbackData('eachSlideTemplate', input);
+            resolve(output);
+        })
+    },
     sliderFeedbacks: function (allClusterFeedbacks) {
         return new Promise((resolve, reject) => {
             var output = View.pasteClusterFeedacks('sliderTemplate', allClusterFeedbacks);

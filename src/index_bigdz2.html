@@ -22,30 +22,33 @@
             z-index: 1000;
         }
 
-        .arrows {
-            position: relative;
+        .prev, .next {
+            cursor: pointer;
+            box-sizing: border-box;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            margin-top: -22px;
+            padding: 16px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            color: #000;
         }
 
-        .arrow-right {
-            position:absolute;
-            top: 40px;
-            left: 10px;
-            width: 0;
-            height: 0;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-
-            border-left: 10px solid green;
+        /* Position the "next button" to the right */
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
         }
 
-        .arrow-left {
-            width: 0;
-            height: 0;
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-
-            border-right:10px solid blue;
+        .prev {
+            left: -15px;
+            border-radius: 3px 0 0 3px;
         }
+        
     </style>
 </head>
 <body>
@@ -68,12 +71,22 @@
         <div style="width:inherit" class="FeedbackValue">
             {{message}}</div>
     </script>
-    <script type="text/x-handlebars-template" id="sliderTemplate">
-        <div class="feedbacks-container">{{{sliderFeedbacks}}}</div>
-        <div class="arrows">
-            <div class="arrow-left"></div>
-            <div class="arrow-right"></div>
+    <script type="text/x-handlebars-template" id="eachSlideTemplate">
+        <div class="eachSlide" style="width:200px; margin-top: 10px; display:none">
+            <div class="FeedbackName">
+                {{username}}</div>
+            <div class="FeedbackPlace">
+                {{place}}</div>
+            <div class="FeedbackAddress" style="color:blue; cursor:pointer; display:block; outline: 1px red solid;">
+                {{address}}</div>
+            <div class="FeedbackValue">
+                {{message}}</div>
         </div>
+    </script>
+    <script type="text/x-handlebars-template" id="sliderTemplate">
+        <div class="feedbacks-container" style="display:block; padding: 0 20px; box outline:1px red solid">{{{sliderFeedbacks}}}</div>
+        <a class="prev">&#10094;</a>
+        <a class="next">&#10095;</a>
     </script>
     <script>
 

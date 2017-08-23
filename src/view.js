@@ -24,7 +24,8 @@ var View = {
         var dataToPass = {
             username: feedbackData.username,
             place: feedbackData.place,
-            message: feedbackData.message
+            message: feedbackData.message,
+            address: feedbackData.address
         }
 
         return renderFn(dataToPass);
