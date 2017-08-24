@@ -60,7 +60,6 @@ function initMap() {
 
                 Controller.feedback(marker.feedback).then((generatedFeedback) => {
                     var feedbacks = document.querySelector('.feedbacks');
-
                     feedbacks.innerHTML = generatedFeedback;
                 })
                 })
@@ -92,14 +91,14 @@ function initMap() {
         if (e.target.id == 'submitFeedback') {
             let form = document.forms['feedback'];
             let address = document.querySelector('.address').innerText;
-            var whatToAdd = new NewFeedback(form, address);
+            let whatToAdd = new NewFeedback(form, address);
             // console.log(whatToAdd)
             let marker = Model.addMarker(map, latlng, whatToAdd);
 
             markers.push(marker);
             Controller.feedback(whatToAdd).then((generatedFeedback) => {
-                var feedbacks = document.querySelector('.feedbacks');
-                var feedbackDiv = document.createElement('div');
+                let feedbacks = document.querySelector('.feedbacks');
+                let feedbackDiv = document.createElement('div');
 
                 feedbackDiv.innerHTML = generatedFeedback;
                 feedbacks.appendChild(feedbackDiv);
@@ -140,15 +139,36 @@ function initMap() {
                 let addressLink = slides[i].querySelector('.FeedbackAddress');
                 addressLink.addEventListener('click', function () {
                     let referenceAddress = addressLink.innerText;
-                    console.log(referenceAddress)
+                    let newContent;
                     let collectedAddresses =[];
+                    let generatedFeedbacks = [];
                     for (var j=0; j<slides.length; j++) {
                         let comparedAddress = slides[j].querySelector('.FeedbackAddress');
                         if (comparedAddress.innerText.replace(/\s/g, '') == referenceAddress.replace(/\s/g, '')) {
                             collectedAddresses.push(slides[j]);
-                            console.log(collectedAddresses.length)
+                            // console.log(collectedAddresses.length)
                         }
                     }
+                    infowindow.close();
+                    collectedAddresses.forEach((item) => {
+                        let feedback = {
+                            username: item.querySelector('.FeedbackUserName').innerHTML,
+                            place: item.querySelector('.FeedbackPlace').innerHTML,
+                            message: item.querySelector('.FeedbackMessage').innerHTML
+                        }
+                        Controller.feedback(feedback).then((generatedFeedback) => {
+                            let feedbacks = document.querySelector('.feedbacks');
+                            let wrapper = document.createElement('div');
+                            wrapper.innerHTML = generatedFeedback;
+                            let feedbackDiv = wrapper.firstElementChild;
+                            // clearFeedbacksDiv(feedbacks);
+                            feedbacks.appendChild(feedbackDiv);
+                        })
+                    })
+                    newContent = View.pastePlace('inputTemplate', referenceAddress, generatedFeedbacks);
+                    infowindow.open(map);
+                    infowindow.setContent(newContent);
+                    infowindow.setPosition(latlng);
                 })
             }
         }

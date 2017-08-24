@@ -1,8 +1,8 @@
 var Controller = {
     address: function (geocoder, map, latlng) {
         return new Promise((resolve, reject) => {
-            Model.getPlace(geocoder, map, latlng).then((response) => {
-                var output = View.pastePlace('inputTemplate', response);
+            Model.getPlace(geocoder, map, latlng).then((address) => {
+                var output = View.pastePlace('inputTemplate', address);
                 resolve(output);
                 // console.log(output)
             })

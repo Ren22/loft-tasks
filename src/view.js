@@ -8,7 +8,8 @@ var View = {
             templateSource = templateElement.innerHTML,
             renderFn = Handlebars.compile(templateSource);
         var addressToPass = {
-            address: address
+            address: address,
+            feedbacks: arguments[2]
         }
 
         return renderFn(addressToPass);

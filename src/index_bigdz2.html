@@ -56,7 +56,7 @@
     <script type = "text/x-handlebars-template" id="inputTemplate">
         <form name = "feedback" class="feedbackStyle">
             <div class="address">{{address}}</div>
-            <div class="feedbacks"></div>
+            <div class="feedbacks" style="margin-top: 10px">{{feedbacks}}</div>
             <input type="text" name="username" placeholder="Your name!" style="margin-top: 10px">
             <input type="text" name="place" placeholder="What's the place?" style="margin-top: 10px">
             <textarea rows="4" cols="30" style="margin-top: 10px" placeholder="Your opinion matters!"></textarea>
@@ -64,22 +64,24 @@
         </form>
     </script>
     <script type="text/x-handlebars-template" id="feedbackTemplate">
-        <div style="width:inherit; margin-top: 10px;" class="FeedbackName">
-            {{username}}</div>
-        <div style="width:inherit" class="FeedbackPlace">
-            {{place}}</div>
-        <div style="width:inherit" class="FeedbackValue">
-            {{message}}</div>
+        <div class="eachFeedback">
+            <div style="width:inherit; margin-top: 10px;" class="FeedbackUserName">
+                {{username}}</div>
+            <div style="width:inherit" class="FeedbackPlace">
+                {{place}}</div>
+            <div style="width:inherit" class="FeedbackValue">
+                {{message}}</div>
+        </div>
     </script>
     <script type="text/x-handlebars-template" id="eachSlideTemplate">
         <div class="eachSlide" style="width:200px; margin-top: 10px; display:none">
-            <div class="FeedbackName">
+            <div class="FeedbackUserName">
                 {{username}}</div>
             <div class="FeedbackPlace">
                 {{place}}</div>
             <div class="FeedbackAddress" style="color:blue; cursor:pointer; display:block; outline: 1px red solid;">
                 {{address}}</div>
-            <div class="FeedbackValue">
+            <div class="FeedbackMessage">
                 {{message}}</div>
         </div>
     </script>
@@ -88,16 +90,12 @@
         <a class="prev">&#10094;</a>
         <a class="next">&#10095;</a>
     </script>
-    <script>
-
-    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js"></script>
     <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
     <script src="initmap.js"></script>
     <script src="model.js"></script>
     <script src="view.js"></script>
     <script src="controller.js"></script>
-    </script>
     <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAO3v5flib0-X7ZcgjT0wu2lhLYaLEZ9qY&callback=initMap">
     </script>
