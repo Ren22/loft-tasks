@@ -1,7 +1,6 @@
 var Model = {
     addMarker: function (map, latLng, feedback) {
         return new google.maps.Marker({
-            // zoomOnClick: false,
             map: map,
             position: latLng,
             feedback: feedback

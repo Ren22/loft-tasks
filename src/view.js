@@ -4,10 +4,10 @@ var View = {
             alert('No address found for View!')
         }
 
-        var templateElement = document.getElementById(templateName),
+        let templateElement = document.getElementById(templateName),
             templateSource = templateElement.innerHTML,
             renderFn = Handlebars.compile(templateSource);
-        var addressToPass = {
+        let addressToPass = {
             address: address,
             feedbacks: arguments[2]
         }
@@ -19,10 +19,10 @@ var View = {
             alert('No feedback provided!')
         }
 
-        var templateElement = document.getElementById(templateName),
+        let templateElement = document.getElementById(templateName),
             templateSource = templateElement.innerHTML,
             renderFn = Handlebars.compile(templateSource);
-        var dataToPass = {
+        let dataToPass = {
             username: feedbackData.username,
             place: feedbackData.place,
             message: feedbackData.message,
@@ -36,10 +36,10 @@ var View = {
             alert('No feedbacks founds!')
         }
 
-        var templateElement = document.getElementById(templateName),
+        let templateElement = document.getElementById(templateName),
             templateSource = templateElement.innerHTML,
             renderFn = Handlebars.compile(templateSource);
-        var dataToPass = {
+        let dataToPass = {
             sliderFeedbacks: allClusterFeedbacks
         }
 
