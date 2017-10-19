@@ -1,4 +1,4 @@
-## LoftSchool example project
+## Here are some JS scripts that I used for practicing purposes. You can find them in different branches
 
 ### Доступные команды
 
